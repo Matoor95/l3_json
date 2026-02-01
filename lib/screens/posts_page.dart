@@ -13,26 +13,58 @@ class PostsPage extends StatefulWidget {
 
 class _PostsPageState extends State<PostsPage> {
   // future qyi retournera la liste des posts
-
   late Future<List<Post>> futurePosts;
+
   @override
-  void initSate() {
+  void initState() {
     super.initState();
-    futurePosts = _loadPosts();
+    futurePosts = loadPosts();
   }
 
-  Future<List<Post>> _loadPosts() async {
-    // omn recupere le contenu brut du fichier json
+  // Methode pour charger le json dans les assets
+  Future<List<Post>> loadPosts() async {
+    // charger le fichier json
     final String response =
         await rootBundle.loadString('assets/data/post.json');
-
-    // on va sdecoder le contenu en liste dynamique
+    // on decode le contenu en liste dynamique
     final List<dynamic> data = jsonDecode(response);
-    // on va convertir chaque element  en objet Post
+    // on convertit la liste dynamique en liste de post
     return data.map((json) => Post.fromJson(json)).toList();
   }
 
+  @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Posts'),
+      ),
+      body: FutureBuilder<List<Post>>(
+        future: futurePosts,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            final posts = snapshot.data!;
+            return ListView.builder(
+              itemCount: posts.length,
+              itemBuilder: (BuildContext context, int index) {
+                final post=posts[index];
+                return Card(
+                  margin: const EdgeInsets.all(8.0),
+                  child: ListTile(
+                    title: Text(post.title),
+                    subtitle: Text(post.content),
+                  ),
+
+                );
+              },
+            );
+
+          }
+        },
+      ),
+    );
   }
 }

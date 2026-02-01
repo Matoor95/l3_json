@@ -16,7 +16,12 @@
         "id":3,
         "title": " mon porimiere post",
         "content":" this is the content of the firts post"
-    }
+    },
+        {
+            "id":4,
+            "title": " mon porimiere post",
+            "content":" this is the content of the firts post"
+        }
 
 
 
